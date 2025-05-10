@@ -1,5 +1,5 @@
 {
-  "name": "@rbxts/rbxts-twin",
+  "name": "@rbxts/twin",
   "version": "0.0.1",
   "description": "A modern TweenService tween builder.",
   "main": "out/init.lua",
