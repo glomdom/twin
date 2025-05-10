@@ -8,8 +8,14 @@
     "watch": "rbxtsc -w",
     "prepublishOnly": "npm run build"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "roblox",
+    "tweens"
+  ],
+  "repository": {
+    "url": "git+https://github.com/glomdom/twin.git"
+  },
+  "author": "glomdom",
   "license": "BSD-3-Clause",
   "type": "commonjs",
   "types": "out/index.d.ts",
