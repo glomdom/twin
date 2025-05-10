@@ -14,4 +14,9 @@ TweenBuilder.for(part)
   .repeat(3)
   .reverse()
   .play();
+
+TweenBuilder.forModel(Workspace.TestModel)
+  .property("Value", Workspace.TestModel.GetPivot().mul(new CFrame(50, 0, 0)))
+  .time(2)
+  .play();
 ```
