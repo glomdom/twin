@@ -13,6 +13,7 @@ export default class TweenBuilder<T extends Instance> {
   private _delayTime: number = 0;
 
   private _onCompleteCallback?: () => void;
+  private _onUpdateCallback?: (value: unknown) => void;
 
   private constructor(instance: T) {
     this._instanceRef = instance;
@@ -20,6 +21,13 @@ export default class TweenBuilder<T extends Instance> {
 
   public static for<T extends Instance>(instance: T): TweenBuilder<T> {
     return new TweenBuilder(instance);
+  }
+
+  public static forModel(model: Model): TweenBuilder<CFrameValue> {
+    const proxy = new Instance("CFrameValue");
+    proxy.Value = model.GetPivot();
+
+    return new TweenBuilder(proxy).onUpdated((value: CFrame) => model.PivotTo(value));
   }
 
   public time(seconds: number): this {
@@ -80,6 +88,12 @@ export default class TweenBuilder<T extends Instance> {
     return this;
   }
 
+  public onUpdated<V>(callback: (value: V) => void): this {
+    this._onUpdateCallback = callback as (value: unknown) => void;
+
+    return this;
+  }
+
   public clone(): TweenBuilder<T> {
     const copy = new TweenBuilder(this._instanceRef);
     copy._tweenTime = this._tweenTime;
@@ -88,8 +102,9 @@ export default class TweenBuilder<T extends Instance> {
     copy._repeatCount = this._repeatCount;
     copy._reverses = this._reverses;
     copy._delayTime = this._delayTime;
-    copy._onCompleteCallback = this._onCompleteCallback;
     copy._properties = Object.assign({}, this._properties);
+    copy._onCompleteCallback = this._onCompleteCallback;
+    copy._onUpdateCallback = this._onUpdateCallback;
 
     return copy;
   }
@@ -122,6 +137,12 @@ export default class TweenBuilder<T extends Instance> {
 
     if (this._onCompleteCallback) {
       tween.Completed.Once(this._onCompleteCallback);
+    }
+
+    if (this._onUpdateCallback && "Value" in this._instanceRef) {
+      const val = this._instanceRef as unknown as ValueBase;
+
+      val.Changed.Connect(this._onUpdateCallback);
     }
 
     tween.Play();
