@@ -99,6 +99,16 @@ export class TweenBuilderBase<T extends Instance> {
 
     return tween;
   }
+
+  public build(): Tween {
+    const tween = this.buildTween();
+
+    if (this.onComplete) {
+      tween.Completed.Once(this.onComplete);
+    }
+
+    return tween;
+  }
 }
 
 export class TweenValueBuilder<T extends ValueBase> extends TweenBuilderBase<T> {
@@ -112,6 +122,20 @@ export class TweenValueBuilder<T extends ValueBase> extends TweenBuilderBase<T> 
     this.onUpdate = callback;
 
     return this;
+  }
+
+  public override build(): Tween {
+    const tween = this.buildTween();
+
+    if (this.onComplete) {
+      tween.Completed.Once(this.onComplete);
+    }
+
+    if (this.onUpdate) {
+      this.instance.Changed.Connect((newVal) => this.onUpdate!(newVal as T["Value"]));
+    }
+
+    return tween;
   }
 
   public override play(): Tween {
