@@ -10,11 +10,19 @@ export class TweenBuilderBase<T extends Instance> {
   protected repeatCount: number = 0;
   protected reverses: boolean = false;
   protected delayTime: number = 0;
+  protected providedInfo?: TweenInfo;
 
   protected onComplete?: () => void;
 
-  constructor(instance: T) {
+  constructor(instance: T, info?: TweenInfo) {
     this.instance = instance;
+    this.providedInfo = info;
+  }
+
+  public info(info: TweenInfo): this {
+    this.providedInfo = info;
+
+    return this;
   }
 
   public time(seconds: number): this {
@@ -76,6 +84,10 @@ export class TweenBuilderBase<T extends Instance> {
   }
 
   protected buildTween(): Tween {
+    if (this.providedInfo !== undefined) {
+      return TweenService.Create(this.instance, this.providedInfo, this.properties);
+    }
+
     const info = new TweenInfo(
       this.tweenTime,
       this.easingStyle,
@@ -169,5 +181,16 @@ export class TweenBuilder {
     proxy.Value = model.GetPivot();
 
     return new TweenValueBuilder(proxy).onUpdated((val) => model.PivotTo(val));
+  }
+
+  public static fromInfo<T extends Instance>(instance: T, info: TweenInfo): TweenBuilderBase<T> {
+    return new TweenBuilderBase(instance, info);
+  }
+
+  public static fromInfoValue<T extends ValueBase>(
+    instance: T,
+    info: TweenInfo,
+  ): TweenValueBuilder<T> {
+    return new TweenValueBuilder(instance).info(info) as TweenValueBuilder<T>;
   }
 }
